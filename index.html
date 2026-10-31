@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bazar Mela | Admin Panel</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#17191c;--muted:#68717d;--line:#e7e9ed;--dark:#111827;--accent:#d5a84b;--red:#d64545;--green:#16845b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:11px 15px;background:var(--dark);color:white;font-weight:650}
+button.secondary{background:#eef0f3;color:#20242a}button.danger{background:#b83232}button.gold{background:var(--accent);color:#171717}
+input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#17191c;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#b68b35}label{display:block;font-size:13px;font-weight:650;margin:10px 0 6px}
+.wrap{max-width:1200px;margin:auto;padding:16px}.top{background:#111827;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-size:20px;font-weight:850}.brand span{color:#e0b85f}.muted{color:var(--muted)}.top .muted{color:#cbd1da}
+.login{max-width:420px;margin:8vh auto;background:white;padding:24px;border-radius:18px;box-shadow:0 10px 35px #10182812}.login h1{margin:0 0 5px}
+.layout{display:grid;grid-template-columns:220px 1fr;gap:18px;margin-top:18px}.side,.panel,.stat{background:var(--card);border:1px solid var(--line);border-radius:15px}
+.side{padding:12px;height:max-content;position:sticky;top:12px}.nav{display:block;width:100%;text-align:left;background:transparent;color:#303640;margin:3px 0}.nav.active,.nav:hover{background:#111827;color:white}
+main{min-width:0}.pagehead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:4px 0 16px}.pagehead h2{margin:0}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.stat{padding:17px}.stat b{display:block;font-size:25px;margin-top:6px}
+.panel{padding:16px;margin-bottom:15px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.full{grid-column:1/-1}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);vertical-align:middle}th{font-size:13px;color:#606975;background:#fafafa}td small{color:var(--muted)}
+.actions{display:flex;gap:7px;flex-wrap:wrap}.actions button{padding:7px 10px;font-size:13px}.pill{display:inline-block;border-radius:30px;padding:4px 9px;background:#edf0f3;font-size:12px}.ok{background:#e4f5ed;color:#126443}.bad{background:#fdeaea;color:#a52828}
+.notice{padding:11px 13px;border-radius:10px;background:#fff6df;color:#735514;margin:10px 0}.error{background:#fff0f0;color:#a52828}.success{background:#eaf8f0;color:#126443}
+.hidden{display:none!important}.empty{text-align:center;padding:24px;color:var(--muted)}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar input{max-width:280px}
+.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;padding:15px;z-index:5}.modalbox{background:white;border-radius:16px;padding:20px;width:min(600px,100%);max-height:90vh;overflow:auto}.modalhead{display:flex;justify-content:space-between;align-items:center}.modalhead h3{margin:0}
+footer{text-align:center;color:#8a929d;padding:20px;font-size:12px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.side{position:static;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.nav{text-align:center;padding:10px 5px;font-size:13px}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.wrap{padding:10px}.top{padding:13px}.brand{font-size:17px}.formgrid,.grid2{grid-template-columns:1fr}.full{grid-column:auto}.pagehead{align-items:flex-start;flex-direction:column}.side{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand">🛍️ <span>Bazar Mela</span> Admin</div><div id="topUser" class="muted">Not signed in</div></header>
+<section id="loginView" class="login">
+<h1>Admin Login</h1><p class="muted">অনুমোদিত অ্যাডমিন অ্যাকাউন্ট দিয়ে প্রবেশ করুন।</p>
+<div id="loginMsg" class="notice hidden"></div>
+<label>Email</label><input id="email" type="email" autocomplete="username" placeholder="admin@example.com">
+<label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="আপনার পাসওয়ার্ড">
+<button id="loginBtn" style="width:100%;margin-top:16px">Login</button>
+</section>
+<div id="appView" class="wrap hidden">
+<div class="layout">
+<aside class="side">
+<button class="nav active" data-page="dashboard">📊 Dashboard</button>
+<button class="nav" data-page="products">📦 Products</button>
+<button class="nav" data-page="categories">🗂️ Categories</button>
+<button class="nav" data-page="orders">🧾 Orders</button>
+<button class="nav" data-page="customers">👥 Customers</button>
+<button class="nav" id="logoutBtn">🚪 Logout</button>
+</aside>
+<main>
+<section id="dashboardPage" class="page">
+<div class="pagehead"><h2>Dashboard</h2><span class="muted" id="today"></span></div>
+<div class="stats">
+<div class="stat">মোট পণ্য<b id="sProducts">0</b></div><div class="stat">ক্যাটাগরি<b id="sCategories">0</b></div>
+<div class="stat">মোট অর্ডার<b id="sOrders">0</b></div><div class="stat">Pending<b id="sPending">0</b></div>
+</div>
+<div class="panel"><h3>সাম্প্রতিক অর্ডার</h3><div id="recentOrders" class="empty">লোড হচ্ছে…</div></div>
+</section>
+<section id="productsPage" class="page hidden">
+<div class="pagehead"><h2>Products</h2><button id="addProductBtn" class="gold">＋ পণ্য যোগ করুন</button></div>
+<div class="panel"><div class="toolbar"><input id="productSearch" placeholder="পণ্যের নাম খুঁজুন…"><button class="secondary" id="refreshProducts">Refresh</button></div><div id="productsTable" class="empty">লোড হচ্ছে…</div></div>
+</section>
+<section id="categoriesPage" class="page hidden">
+<div class="pagehead"><h2>Categories</h2><button id="addCategoryBtn" class="gold">＋ ক্যাটাগরি যোগ করুন</button></div>
+<div class="panel"><div id="categoriesTable" class="empty">লোড হচ্ছে…</div></div>
+</section>
+<section id="ordersPage" class="page hidden">
+<div class="pagehead"><h2>Orders</h2><button class="secondary" id="refreshOrders">Refresh</button></div>
+<div class="panel"><div id="ordersTable" class="empty">লোড হচ্ছে…</div></div>
+</section>
+<section id="customersPage" class="page hidden">
+<div class="pagehead"><h2>Customers</h2><button class="secondary" id="refreshCustomers">Refresh</button></div>
+<div class="panel"><div id="customersTable" class="empty">লোড হচ্ছে…</div></div>
+</section>
+</main></div><footer>Bazar Mela Admin Panel</footer>
+</div>
+<div id="modal" class="modal hidden"><div class="modalbox"><div class="modalhead"><h3 id="modalTitle">ফর্ম</h3><button class="secondary" id="closeModal">✕</button></div><div id="modalBody"></div></div></div>
+<div id="globalMsg" class="notice hidden" style="position:fixed;bottom:12px;left:12px;right:12px;z-index:10"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* Firebase Console > Project settings > Your apps থেকে নিজের config বসান।
+   API Key কাউকে চ্যাটে পাঠাবেন না। এটি Firebase Web App-এর client config; key restriction অভিভাবকের সহায়তায় সেট করুন। */
+const firebaseConfig = {
+  apiKey: "PASTE_YOUR_FIREBASE_API_KEY",
+  authDomain: "bazar-mela.firebaseapp.com",
+  projectId: "bazar-mela",
+  storageBucket: "bazar-mela.firebasestorage.app",
+  messagingSenderId: "634216623730",
+  appId: "1:634216623730:web:5f54a39974b45fa2551ceb"
+};
+
+const $ = id => document.getElementById(id);
+const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
+let currentUser = null, products = [], categories = [], orders = [], customers = [];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function msg(text, type="notice", target="globalMsg"){const el=$(target);el.textContent=text;el.className="notice "+type;el.classList.remove("hidden");if(target==="globalMsg")setTimeout(()=>el.classList.add("hidden"),5000);}
+function showLogin(text=""){ $("loginView").classList.remove("hidden");$("appView").classList.add("hidden");if(text)msg(text,"error","loginMsg"); }
+function showApp(){ $("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("topUser").textContent=currentUser?.email||"Admin"; }
+async function verifyAdmin(user){
+  const snap=await getDoc(doc(db,"admins",user.uid));
+  return snap.exists() && snap.data().active === true;
+}
+onAuthStateChanged(auth, async user=>{
+  if(!user){currentUser=null;showLogin();return;}
+  try{
+    if(!(await verifyAdmin(user))){await signOut(auth);showLogin("এই অ্যাকাউন্টটি Admin হিসেবে অনুমোদিত নয়। admins/"+user.uid+" ডকুমেন্টে active=true আছে কি না যাচাই করুন।");return;}
+    currentUser=user;showApp();await loadAll();
+  }catch(e){await signOut(auth);showLogin("Admin যাচাই হয়নি: "+e.message);}
+});
+$("loginBtn").addEventListener("click",async()=>{
+  const email=$("email").value.trim(), password=$("password").value;
+  if(!email||!password){msg("Email এবং Password লিখুন।","error","loginMsg");return;}
+  $("loginBtn").disabled=true;$("loginBtn").textContent="লগইন হচ্ছে…";
+  try{await signInWithEmailAndPassword(auth,email,password);}catch(e){msg("Login error: "+e.message,"error","loginMsg");}
+  finally{$("loginBtn").disabled=false;$("loginBtn").textContent="Login";}
+});
+$("logoutBtn").addEventListener("click",()=>signOut(auth));
+$("password").addEventListener("keydown",e=>{if(e.key==="Enter")$("loginBtn").click();});
+document.querySelectorAll(".nav[data-page]").forEach(b=>b.addEventListener("click",()=>openPage(b.dataset.page)));
+function openPage(name){document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));$(name+"Page").classList.remove("hidden");document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===name));}
+async function readCol(name){const snap=await getDocs(collection(db,name));return snap.docs.map(d=>({id:d.id,...d.data()}));}
+async function loadAll(){
+  try{
+    [products,categories,orders,customers]=await Promise.all([readCol("products"),readCol("categories"),readCol("orders"),readCol("users")]);
+    renderAll();
+  }catch(e){msg("ডেটা লোড হয়নি: "+e.message+" — Firestore Rules ও collection path পরীক্ষা করুন।","error");}
+}
+function renderAll(){
+  $("sProducts").textContent=products.length;$("sCategories").textContent=categories.length;$("sOrders").textContent=orders.length;
+  $("sPending").textContent=orders.filter(o=>(o.status||"Pending")==="Pending").length;
+  $("today").textContent=new Date().toLocaleDateString("bn-BD");
+  renderProducts();renderCategories();renderOrders();renderCustomers();renderRecent();
+}
+function renderProducts(){
+ const term=$("productSearch").value.toLowerCase();
+ const rows=products.filter(p=>(p.name||"").toLowerCase().includes(term)).map(p=>`<tr><td>${esc(p.name)}</td><td>৳${esc(p.price)}</td><td>${esc(p.stock??0)}</td><td>${esc(p.category||"-")}</td><td><span class="pill ${p.active===false?"bad":"ok"}">${p.active===false?"Inactive":"Active"}</span></td><td><div class="actions"><button class="secondary" data-edit-product="${esc(p.id)}">Edit</button><button class="danger" data-del-product="${esc(p.id)}">Delete</button></div></td></tr>`).join("");
+ $("productsTable").innerHTML=rows?`<div class="tablewrap"><table><thead><tr><th>নাম</th><th>দাম</th><th>স্টক</th><th>ক্যাটাগরি</th><th>অবস্থা</th><th>কাজ</th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty">কোনো পণ্য পাওয়া যায়নি।</div>';
+}
+function renderCategories(){
+ const rows=categories.map(c=>`<tr><td>${esc(c.name)}</td><td><span class="pill ${c.active===false?"bad":"ok"}">${c.active===false?"Inactive":"Active"}</span></td><td><div class="actions"><button class="secondary" data-edit-category="${esc(c.id)}">Edit</button><button class="danger" data-del-category="${esc(c.id)}">Delete</button></div></td></tr>`).join("");
+ $("categoriesTable").innerHTML=rows?`<div class="tablewrap"><table><thead><tr><th>নাম</th><th>অবস্থা</th><th>কাজ</th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty">কোনো ক্যাটাগরি নেই।</div>';
+}
+function renderOrders(){
+ const sorted=[...orders].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+ const rows=sorted.map(o=>`<tr><td>${esc(o.id)}</td><td>${esc(o.customerName||o.name||o.customerEmail||"-")}<br><small>${esc(o.phone||"")}</small></td><td>৳${esc(o.total??o.totalAmount??"-")}</td><td><select data-order-status="${esc(o.id)}">${["Pending","Processing","Shipped","Delivered","Cancelled"].map(s=>`<option ${((o.status||"Pending")===s)?"selected":""}>${s}</option>`).join("")}</select></td><td><small>${esc(o.address||"-")}</small></td><td><button class="secondary" data-order-view="${esc(o.id)}">Details</button></td></tr>`).join("");
+ $("ordersTable").innerHTML=rows?`<div class="tablewrap"><table><thead><tr><th>Order ID</th><th>Customer</th><th>Total</th><th>Status</th><th>Address</th><th>Details</th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty">এখনো কোনো অর্ডার নেই।</div>';
+}
+function renderCustomers(){
+ const rows=customers.map(u=>`<tr><td>${esc(u.name||u.displayName||"-")}</td><td>${esc(u.email||"-")}</td><td>${esc(u.phone||"-")}</td><td><small>${esc(u.createdAt||"-")}</small></td></tr>`).join("");
+ $("customersTable").innerHTML=rows?`<div class="tablewrap"><table><thead><tr><th>নাম</th><th>Email</th><th>ফোন</th><th>যোগদানের সময়</th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty">কাস্টমার ডেটা পাওয়া যায়নি।</div>';
+}
+function renderRecent(){
+ const recent=[...orders].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5);
+ $("recentOrders").innerHTML=recent.length?`<div class="tablewrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>${recent.map(o=>`<tr><td>${esc(o.id)}</td><td>${esc(o.customerName||o.name||"-")}</td><td>৳${esc(o.total??o.totalAmount??"-")}</td><td>${esc(o.status||"Pending")}</td></tr>`).join("")}</tbody></table></div>`:'এখনো কোনো অর্ডার নেই।';
+}
+function openModal(title,body){$("modalTitle").textContent=title;$("modalBody").innerHTML=body;$("modal").classList.remove("hidden");}
+function closeModal(){$("modal").classList.add("hidden");}
+$("closeModal").onclick=closeModal;$("modal").addEventListener("click",e=>{if(e.target===$("modal"))closeModal();});
+function productForm(p={}){
+ openModal(p.id?"পণ্য সম্পাদনা":"নতুন পণ্য যোগ করুন",`
+ <form id="productForm"><div class="formgrid">
+ <div class="full"><label>পণ্যের নাম *</label><input name="name" required value="${esc(p.name||"")}"></div>
+ <div><label>দাম (৳) *</label><input name="price" type="number" min="0" step="0.01" required value="${esc(p.price??"")}"></div>
+ <div><label>স্টক</label><input name="stock" type="number" min="0" value="${esc(p.stock??0)}"></div>
+ <div><label>ক্যাটাগরি</label><select name="category"><option value="">নির্বাচন করুন</option>${categories.map(c=>`<option ${p.category===c.name?"selected":""}>${esc(c.name)}</option>`).join("")}</select></div>
+ <div><label>ছবির HTTPS URL</label><input name="imageUrl" type="url" placeholder="https://..." value="${esc(p.imageUrl||"")}"></div>
+ <div class="full"><label>বিবরণ</label><textarea name="description" rows="3">${esc(p.description||"")}</textarea></div>
+ <div class="full"><label><input name="active" type="checkbox" style="width:auto" ${p.active!==false?"checked":""}> পণ্য Active রাখুন</label></div>
+ </div><button style="width:100%;margin-top:14px">Save Product</button></form>`);
+ $("productForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const data={name:f.get("name").trim(),price:Number(f.get("price")),stock:Number(f.get("stock")||0),category:f.get("category"),imageUrl:f.get("imageUrl").trim(),description:f.get("description").trim(),active:f.get("active")==="on",updatedAt:Date.now()};
+ if(!data.name||!Number.isFinite(data.price)||data.price<0||data.stock<0){msg("পণ্যের নাম, সঠিক দাম ও স্টক দিন।","error");return;}
+ try{if(p.id)await updateDoc(doc(db,"products",p.id),data);else await addDoc(collection(db,"products"),{...data,createdAt:Date.now()});closeModal();await loadAll();msg("পণ্য সফলভাবে সংরক্ষণ হয়েছে।","success");}catch(err){msg("পণ্য সংরক্ষণ হয়নি: "+err.message,"error");}
+ };
+}
+function categoryForm(c={}){
+ openModal(c.id?"ক্যাটাগরি সম্পাদনা":"নতুন ক্যাটাগরি",`<form id="categoryForm"><label>ক্যাটাগরির নাম *</label><input name="name" required value="${esc(c.name||"")}"><label><input name="active" type="checkbox" style="width:auto" ${c.active!==false?"checked":""}> Active</label><button style="width:100%;margin-top:14px">Save Category</button></form>`);
+ $("categoryForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),data={name:f.get("name").trim(),active:f.get("active")==="on",updatedAt:Date.now()};try{if(c.id)await updateDoc(doc(db,"categories",c.id),data);else await addDoc(collection(db,"categories"),{...data,createdAt:Date.now()});closeModal();await loadAll();msg("ক্যাটাগরি সংরক্ষণ হয়েছে।","success");}catch(err){msg("ক্যাটাগরি সংরক্ষণ হয়নি: "+err.message,"error");}};
+}
+$("addProductBtn").onclick=()=>productForm();$("addCategoryBtn").onclick=()=>categoryForm();
+$("productSearch").addEventListener("input",renderProducts);$("refreshProducts").onclick=loadAll;$("refreshOrders").onclick=loadAll;$("refreshCustomers").onclick=loadAll;
+$("productsTable").addEventListener("click",async e=>{const edit=e.target.closest("[data-edit-product]"),del=e.target.closest("[data-del-product]");if(edit){const p=products.find(x=>x.id===edit.dataset.editProduct);if(p)productForm(p);}if(del){const id=del.dataset.delProduct;if(confirm("এই পণ্যটি ডিলিট করবেন?"))try{await deleteDoc(doc(db,"products",id));await loadAll();msg("পণ্য ডিলিট হয়েছে।","success");}catch(err){msg("ডিলিট হয়নি: "+err.message,"error");}}});
+$("categoriesTable").addEventListener("click",async e=>{const edit=e.target.closest("[data-edit-category]"),del=e.target.closest("[data-del-category]");if(edit){const c=categories.find(x=>x.id===edit.dataset.editCategory);if(c)categoryForm(c);}if(del){const id=del.dataset.delCategory;if(confirm("ক্যাটাগরিটি ডিলিট করবেন?"))try{await deleteDoc(doc(db,"categories",id));await loadAll();msg("ক্যাটাগরি ডিলিট হয়েছে।","success");}catch(err){msg("ডিলিট হয়নি: "+err.message,"error");}}});
+$("ordersTable").addEventListener("change",async e=>{const id=e.target.dataset.orderStatus;if(!id)return;try{await updateDoc(doc(db,"orders",id),{status:e.target.value,updatedAt:Date.now()});await loadAll();msg("অর্ডারের স্ট্যাটাস আপডেট হয়েছে।","success");}catch(err){msg("স্ট্যাটাস পরিবর্তন হয়নি: "+err.message,"error");}});
+$("ordersTable").addEventListener("click",e=>{const b=e.target.closest("[data-order-view]");if(!b)return;const o=orders.find(x=>x.id===b.dataset.orderView);if(o)openModal("অর্ডারের বিস্তারিত",`<pre style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(JSON.stringify(o,null,2))}</pre>`);});
+</script>
+</body></html>
